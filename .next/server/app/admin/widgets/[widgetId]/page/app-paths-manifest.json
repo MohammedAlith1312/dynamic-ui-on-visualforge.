@@ -1,0 +1,3 @@
+{
+  "/admin/widgets/[widgetId]/page": "app/admin/widgets/[widgetId]/page.js"
+}
