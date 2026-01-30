@@ -19,6 +19,7 @@ import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent, pointerWithin 
 import { useHistory } from "@/hooks/useHistory";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { DeviceFrame } from "@/components/editor/DeviceFrame";
+// import { revalidatePage } from "@/app/actions/revalidate";
 
 type Page = Tables<"pages">;
 type PageRow = Tables<"page_rows">;
@@ -800,22 +801,61 @@ const PageEditor = () => {
     setShowPreview(true);
   };
 
-  const handlePublishToggle = async () => {
-    if (!page) return;
+  // const handlePublishToggle = async () => {
+  //   if (!page) return;
 
-    const { error } = await supabase
-      .from("pages")
-      .update({ is_published: !page.is_published })
-      .eq("id", page.id);
+  //   const newIsPublished = !page.is_published;
 
-    if (error) {
-      toast.error("Failed to update page");
-      return;
-    }
+  //   const { error } = await supabase
+  //     .from("pages")
+  //     .update({ is_published: newIsPublished })
+  //     .eq("id", page.id);
 
-    setPage({ ...page, is_published: !page.is_published });
-    toast.success(page.is_published ? "Page unpublished" : "Page published");
-  };
+  //   if (error) {
+  //     toast.error("Failed to update page");
+  //     return;
+  //   }
+
+  //   setPage({ ...page, is_published: newIsPublished });
+
+  //   // Clear cache immediately
+  //   await revalidatePage(page.slug);
+
+  //   toast.success(newIsPublished ? "Page published" : "Page unpublished");
+
+  //   // Auto-download HTML when publishing
+  //   if (newIsPublished) {
+  //     try {
+  //       toast.info("Preparing download...");
+
+  //       // Fetch the page content from the app's own public route
+  //       // Add timestamp to force freshness
+  //       const path = `/page/${page.slug}?t=${Date.now()}`;
+
+  //       const response = await fetch(path);
+  //       if (!response.ok) throw new Error("Failed to fetch page content");
+
+  //       const html = await response.text();
+
+  //       const blob = new Blob([html], { type: "text/html" });
+  //       const url = window.URL.createObjectURL(blob);
+  //       const a = document.createElement("a");
+  //       a.href = url;
+  //       a.download = `${page.slug}.html`;
+  //       document.body.appendChild(a);
+  //       a.click();
+
+  //       // Cleanup
+  //       window.URL.revokeObjectURL(url);
+  //       document.body.removeChild(a);
+
+  //       toast.success("HTML downloaded successfully");
+  //     } catch (err) {
+  //       console.error("Download failed", err);
+  //       toast.error("Failed to download HTML file. Please check console.");
+  //     }
+  //   }
+  // };
 
   const handleLayoutChange = async (layoutId: string | null) => {
     if (!page) return;
@@ -927,7 +967,7 @@ const PageEditor = () => {
                     </Button>
                     <Button
                       variant={page?.is_published ? "outline" : "default"}
-                      onClick={handlePublishToggle}
+                      // onClick={handlePublishToggle}
                       className="gap-2"
                     >
                       {page?.is_published ? (
