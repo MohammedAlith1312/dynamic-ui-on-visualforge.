@@ -23,7 +23,7 @@ type LayoutComponent = Tables<"layout_components">;
 
 const LayoutEditor = () => {
   const params = useParams();
-  const layoutId = params.layoutId as string;
+  const layoutId = params?.layoutId as string;
   const router = useRouter();
   const { copiedComponent } = useClipboard();
   const [layout, setLayout] = useState<Layout | null>(null);

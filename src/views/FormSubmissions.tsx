@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 export default function FormSubmissions() {
   const params = useParams();
-  const formId = params.formId as string;
+  const formId = params?.formId as string;
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<any>(null);

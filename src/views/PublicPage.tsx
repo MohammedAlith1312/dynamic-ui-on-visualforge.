@@ -16,7 +16,7 @@ type LayoutComponent = Tables<"layout_components">;
 
 const PublicPage = () => {
   const params = useParams();
-  const slug = params.slug as string;
+  const slug = params?.slug as string;
   const [page, setPage] = useState<Page | null>(null);
   const [rows, setRows] = useState<PageRow[]>([]);
   const [components, setComponents] = useState<PageComponent[]>([]);

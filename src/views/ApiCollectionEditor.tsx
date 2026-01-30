@@ -13,7 +13,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 
 const ApiCollectionEditor = () => {
   const params = useParams();
-  const collectionId = params.collectionId as string;
+  const collectionId = params?.collectionId as string;
   const router = useRouter();
 
   const [collection, setCollection] = useState<any>(null);

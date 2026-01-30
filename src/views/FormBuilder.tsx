@@ -19,7 +19,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
 export default function FormBuilder() {
   const params = useParams();
-  const formId = params.formId as string;
+  const formId = params?.formId as string;
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

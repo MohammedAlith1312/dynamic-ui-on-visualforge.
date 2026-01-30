@@ -19,7 +19,7 @@ import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent, pointerWithin 
 import { useHistory } from "@/hooks/useHistory";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { DeviceFrame } from "@/components/editor/DeviceFrame";
-// import { revalidatePage } from "@/app/actions/revalidate";
+import { revalidatePage } from "@/app/actions/revalidate";
 
 type Page = Tables<"pages">;
 type PageRow = Tables<"page_rows">;
@@ -30,7 +30,7 @@ type LayoutComponent = Tables<"layout_components">;
 
 const PageEditor = () => {
   const params = useParams();
-  const pageId = params.pageId as string;
+  const pageId = params?.pageId as string;
   const router = useRouter();
   const { copiedComponent } = useClipboard();
   const [page, setPage] = useState<Page | null>(null);
@@ -801,61 +801,47 @@ const PageEditor = () => {
     setShowPreview(true);
   };
 
-  // const handlePublishToggle = async () => {
-  //   if (!page) return;
+  const handlePublishToggle = async () => {
+    if (!page) return;
 
-  //   const newIsPublished = !page.is_published;
+    const newIsPublished = !page.is_published;
 
-  //   const { error } = await supabase
-  //     .from("pages")
-  //     .update({ is_published: newIsPublished })
-  //     .eq("id", page.id);
+    const { error } = await supabase
+      .from("pages")
+      .update({ is_published: newIsPublished })
+      .eq("id", page.id);
 
-  //   if (error) {
-  //     toast.error("Failed to update page");
-  //     return;
-  //   }
+    if (error) {
+      toast.error("Failed to update page");
+      return;
+    }
 
-  //   setPage({ ...page, is_published: newIsPublished });
+    setPage({ ...page, is_published: newIsPublished });
 
-  //   // Clear cache immediately
-  //   await revalidatePage(page.slug);
+    // Clear cache immediately so the change is reflected in the public UI
+    if (page.slug) {
+      // Fetch fresh HTML content before revalidating if we are publishing
+      if (newIsPublished) {
+        try {
+          const path = `/page/${page.slug}?t=${Date.now()}`;
+          const response = await fetch(path);
+          if (response.ok) {
+            const html = await response.text();
+            // Update the DB with the actual HTML content
+            await supabase
+              .from("pages")
+              .update({ published_html: html } as any)
+              .eq("id", page.id);
+          }
+        } catch (err) {
+          console.error("Failed to fetch/save HTML during publish:", err);
+        }
+      }
+      await revalidatePage(page.slug);
+    }
 
-  //   toast.success(newIsPublished ? "Page published" : "Page unpublished");
-
-  //   // Auto-download HTML when publishing
-  //   if (newIsPublished) {
-  //     try {
-  //       toast.info("Preparing download...");
-
-  //       // Fetch the page content from the app's own public route
-  //       // Add timestamp to force freshness
-  //       const path = `/page/${page.slug}?t=${Date.now()}`;
-
-  //       const response = await fetch(path);
-  //       if (!response.ok) throw new Error("Failed to fetch page content");
-
-  //       const html = await response.text();
-
-  //       const blob = new Blob([html], { type: "text/html" });
-  //       const url = window.URL.createObjectURL(blob);
-  //       const a = document.createElement("a");
-  //       a.href = url;
-  //       a.download = `${page.slug}.html`;
-  //       document.body.appendChild(a);
-  //       a.click();
-
-  //       // Cleanup
-  //       window.URL.revokeObjectURL(url);
-  //       document.body.removeChild(a);
-
-  //       toast.success("HTML downloaded successfully");
-  //     } catch (err) {
-  //       console.error("Download failed", err);
-  //       toast.error("Failed to download HTML file. Please check console.");
-  //     }
-  //   }
-  // };
+    toast.success(newIsPublished ? "Page published" : "Page unpublished");
+  };
 
   const handleLayoutChange = async (layoutId: string | null) => {
     if (!page) return;
@@ -967,7 +953,7 @@ const PageEditor = () => {
                     </Button>
                     <Button
                       variant={page?.is_published ? "outline" : "default"}
-                      // onClick={handlePublishToggle}
+                      onClick={handlePublishToggle}
                       className="gap-2"
                     >
                       {page?.is_published ? (

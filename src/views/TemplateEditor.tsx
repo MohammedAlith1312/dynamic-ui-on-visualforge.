@@ -33,7 +33,7 @@ interface TemplateComponent {
 
 const TemplateEditor = () => {
   const params = useParams();
-  const templateId = params.templateId as string;
+  const templateId = params?.templateId as string;
   const router = useRouter();
   const [template, setTemplate] = useState<any>(null);
   const [name, setName] = useState("");

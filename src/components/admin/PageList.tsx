@@ -3,10 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye, EyeOff, Monitor } from "lucide-react";
+import { Edit, Trash2, Eye, EyeOff, Monitor, Code, Download } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { PagePreviewModal } from "@/components/editor/PagePreviewModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Page = Tables<"pages">;
 type PageRow = Tables<"page_rows">;
@@ -30,6 +39,7 @@ export const PageList = ({ onCreatePage }: PageListProps) => {
   const [previewLayoutRows, setPreviewLayoutRows] = useState<LayoutRow[]>([]);
   const [previewLayoutComponents, setPreviewLayoutComponents] = useState<LayoutComponent[]>([]);
   const [widgetData, setWidgetData] = useState<Map<string, { rows: any[]; components: any[] }>>(new Map());
+  const [selectedHtmlPage, setSelectedHtmlPage] = useState<Page | null>(null);
 
   const handlePreview = async (page: Page) => {
     const { data: rows } = await supabase
@@ -195,6 +205,15 @@ export const PageList = ({ onCreatePage }: PageListProps) => {
                 Edit
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedHtmlPage(page)}
+                title="View HTML Source"
+                className="gap-2"
+              >
+                <Code className="h-3 w-3" />
+              </Button>
+              <Button
                 variant="destructive"
                 size="sm"
                 onClick={() => handleDelete(page.id)}
@@ -218,6 +237,65 @@ export const PageList = ({ onCreatePage }: PageListProps) => {
         layoutComponents={previewLayoutComponents}
         widgetData={widgetData}
       />
+
+      <Dialog open={!!selectedHtmlPage} onOpenChange={(open) => !open && setSelectedHtmlPage(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>HTML Source: {selectedHtmlPage?.title}</DialogTitle>
+            <DialogDescription>
+              This is the static HTML content that was generated when the page was last published.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden border rounded-md bg-muted/50 p-4 font-mono text-sm">
+            <ScrollArea className="h-full w-full">
+              <pre className="whitespace-pre-wrap">
+                {(selectedHtmlPage as any)?.published_html || "No published HTML found. Please publish the page first."}
+              </pre>
+            </ScrollArea>
+          </div>
+          <DialogFooter className="mt-4 flex justify-between sm:justify-between items-center">
+            <p className="text-xs text-muted-foreground">
+              Slug: /{selectedHtmlPage?.slug}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const html = (selectedHtmlPage as any)?.published_html;
+                  if (html) {
+                    navigator.clipboard.writeText(html);
+                    toast.success("Code copied to clipboard");
+                  }
+                }}
+              >
+                Copy Code
+              </Button>
+              <Button
+                disabled={!(selectedHtmlPage as any)?.published_html}
+                onClick={() => {
+                  const html = (selectedHtmlPage as any)?.published_html;
+                  if (html) {
+                    const blob = new Blob([html], { type: "text/html" });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `${selectedHtmlPage?.slug}.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    toast.success("File downloaded");
+                  }
+                }}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download HTML
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -16,7 +16,7 @@ import { ArrowLeft, Save } from "lucide-react";
 
 export default function FormSettings() {
   const params = useParams();
-  const formId = params.formId as string;
+  const formId = params?.formId as string;
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

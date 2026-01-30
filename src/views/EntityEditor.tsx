@@ -38,7 +38,7 @@ interface EntityField {
 const EntityEditor = () => {
   const router = useRouter();
   const params = useParams();
-  const entityId = params.entityId as string;
+  const entityId = params?.entityId as string;
   const [entity, setEntity] = useState<Entity | null>(null);
   const [fields, setFields] = useState<EntityField[]>([]);
   const [loading, setLoading] = useState(true);

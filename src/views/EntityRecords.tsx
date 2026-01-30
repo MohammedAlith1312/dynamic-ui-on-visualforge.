@@ -106,7 +106,7 @@ interface ViewOptions {
 const EntityRecords = () => {
   const router = useRouter();
   const params = useParams();
-  const entityId = params.entityId as string;
+  const entityId = params?.entityId as string;
   const [entity, setEntity] = useState<Entity | null>(null);
   const [fields, setFields] = useState<EntityField[]>([]);
   const [records, setRecords] = useState<EntityRecord[]>([]);

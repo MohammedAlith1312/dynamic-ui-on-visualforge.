@@ -17,7 +17,7 @@ import QueryConditionTree from "@/components/queries/QueryConditionTree";
 
 export default function QueryEditor() {
   const params = useParams();
-  const queryId = params.queryId as string;
+  const queryId = params?.queryId as string;
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);

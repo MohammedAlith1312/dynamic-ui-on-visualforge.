@@ -491,7 +491,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     if (path === "/admin") {
       return pathname === "/admin";
     }
-    return pathname.startsWith(path);
+    return pathname?.startsWith(path);
   };
 
   return (

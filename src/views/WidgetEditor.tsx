@@ -23,7 +23,7 @@ type WidgetComponent = Tables<"widget_components">;
 
 const WidgetEditor = () => {
   const params = useParams();
-  const widgetId = params.widgetId as string;
+  const widgetId = params?.widgetId as string;
   const router = useRouter();
   const { copiedComponent } = useClipboard();
   const [widget, setWidget] = useState<Widget | null>(null);

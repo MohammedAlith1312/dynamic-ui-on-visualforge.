@@ -3,8 +3,7 @@ import PublicPageComponent from "@/components/PublicPageComponent";
 import { notFound } from "next/navigation";
 import { Tables } from "@/integrations/supabase/types";
 
-// This function tells Next.js which paths to pre-render at build time
-export const dynamicParams = true; // Allow new pages to be rendered on demand
+
 
 export async function generateStaticParams() {
     const { data: pages } = await supabase

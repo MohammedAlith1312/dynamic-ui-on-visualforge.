@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export default function QueryResults() {
   const params = useParams();
-  const queryId = params.queryId as string;
+  const queryId = params?.queryId as string;
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
